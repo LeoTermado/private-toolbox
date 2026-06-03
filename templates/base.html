@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Private Toolbox{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <a href="{{ url_for('index') }}" class="brand">🧰 Toolbox</a>
+        <nav class="nav">
+            {% for tool in tools %}
+            <a class="nav-link {% if request.path == tool.path %}active{% endif %}"
+               href="{{ url_for(tool.endpoint) }}">
+                <span class="nav-icon">{{ tool.icon }}</span>
+                <span class="nav-label">{{ tool.label }}</span>
+                {% if not tool.implemented %}<span class="badge">soon</span>{% endif %}
+            </a>
+            {% endfor %}
+        </nav>
+    </aside>
+
+    <main class="content">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

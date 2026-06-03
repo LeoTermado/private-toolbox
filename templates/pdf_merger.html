@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}PDF Merger — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>🔗 PDF Merger</h1>
+    <p class="subtitle">Upload multiple PDFs, arrange the order, and combine them into one file.</p>
+</header>
+
+<div class="panel">
+    <form id="merger-form" action="{{ url_for('pdf_merger.merge') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="files">Select PDF Files</label>
+            <input type="file" id="files" name="files" accept=".pdf" multiple>
+            <p class="hint">Select 2 or more PDFs. You can reorder and remove them below.</p>
+        </div>
+
+        <div class="form-group">
+            <label>Selected Files</label>
+            <ul id="file-list" class="file-list"></ul>
+            <p id="file-list-empty" class="hint">No files selected yet.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="output_name">Output File Name</label>
+            <input type="text" id="output_name" name="output_name" placeholder="e.g., merged_documents" required>
+        </div>
+
+        <button type="submit" class="btn">🔗 Merge PDFs</button>
+    </form>
+</div>
+{% endblock %}

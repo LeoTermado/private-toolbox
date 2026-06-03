@@ -24,7 +24,7 @@ from tools.document_redactor.routes import bp as document_redactor_bp
 # endpoint -> Flask endpoint for url_for; path -> resolved URL (for active highlight).
 TOOLS = [
     {"endpoint": "pdf_splitter.index",     "path": "/pdf/splitter/",     "label": "PDF Splitter",      "icon": "📄", "implemented": True},
-    {"endpoint": "pdf_merger.index",       "path": "/pdf/merger/",       "label": "PDF Merger",        "icon": "🔗", "implemented": False},
+    {"endpoint": "pdf_merger.index",       "path": "/pdf/merger/",       "label": "PDF Merger",        "icon": "🔗", "implemented": True},
     {"endpoint": "pdf_compressor.index",   "path": "/pdf/compressor/",   "label": "PDF Compressor",    "icon": "🗜️", "implemented": False},
     {"endpoint": "image_to_pdf.index",     "path": "/image/to-pdf/",     "label": "Image to PDF",      "icon": "🖼️", "implemented": False},
     {"endpoint": "pdf_to_image.index",     "path": "/pdf/to-image/",     "label": "PDF to Image",      "icon": "🏞️", "implemented": False},

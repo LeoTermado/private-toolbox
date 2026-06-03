@@ -9,4 +9,108 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(function () { el.remove(); }, 400);
         }, 5000);
     });
+
+    initPdfMerger();
 });
+
+// ---- PDF Merger: file list with reorder / remove ----
+// Maintains a selectedFiles array and syncs it back to the file input via a
+// DataTransfer so the server receives the files in the visible order.
+function initPdfMerger() {
+    var fileInput = document.getElementById('files');
+    var list = document.getElementById('file-list');
+    var emptyMsg = document.getElementById('file-list-empty');
+    if (!fileInput || !list) return; // not on the merger page
+
+    var selectedFiles = [];
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function sameFile(a, b) {
+        return a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
+    }
+
+    function syncInput() {
+        var dt = new DataTransfer();
+        selectedFiles.forEach(function (f) { dt.items.add(f); });
+        fileInput.files = dt.files;
+    }
+
+    function render() {
+        list.innerHTML = '';
+        if (selectedFiles.length === 0) {
+            emptyMsg.style.display = '';
+            return;
+        }
+        emptyMsg.style.display = 'none';
+
+        selectedFiles.forEach(function (file, i) {
+            var li = document.createElement('li');
+            li.className = 'file-item';
+
+            var info = document.createElement('div');
+            info.className = 'file-info';
+            info.innerHTML = '<span class="file-name">' + (i + 1) + '. ' + escapeHtml(file.name) +
+                '</span><span class="file-size">' + formatSize(file.size) + '</span>';
+
+            var actions = document.createElement('div');
+            actions.className = 'file-actions';
+            actions.appendChild(makeBtn('↑', 'Move up', i === 0, function () { move(i, -1); }));
+            actions.appendChild(makeBtn('↓', 'Move down', i === selectedFiles.length - 1, function () { move(i, 1); }));
+            actions.appendChild(makeBtn('✕', 'Remove', false, function () { removeAt(i); }, 'remove'));
+
+            li.appendChild(info);
+            li.appendChild(actions);
+            list.appendChild(li);
+        });
+    }
+
+    function makeBtn(text, title, disabled, onClick, extraClass) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'file-btn' + (extraClass ? ' file-btn-' + extraClass : '');
+        b.textContent = text;
+        b.title = title;
+        b.disabled = disabled;
+        b.addEventListener('click', onClick);
+        return b;
+    }
+
+    function move(i, dir) {
+        var j = i + dir;
+        if (j < 0 || j >= selectedFiles.length) return;
+        var tmp = selectedFiles[i];
+        selectedFiles[i] = selectedFiles[j];
+        selectedFiles[j] = tmp;
+        render();
+        syncInput();
+    }
+
+    function removeAt(i) {
+        selectedFiles.splice(i, 1);
+        render();
+        syncInput();
+    }
+
+    fileInput.addEventListener('change', function () {
+        Array.prototype.forEach.call(fileInput.files, function (f) {
+            if (!f.name.toLowerCase().endsWith('.pdf')) return; // PDFs only
+            var dup = selectedFiles.some(function (e) { return sameFile(e, f); });
+            if (!dup) selectedFiles.push(f);
+        });
+        render();
+        syncInput();
+    });
+
+    render();
+}
+
+function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+}

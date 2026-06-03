@@ -28,5 +28,10 @@
 
         <button type="submit" class="btn">🔗 Merge PDFs</button>
     </form>
+
+    <form action="{{ url_for('pdf_merger.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
 </div>
 {% endblock %}

@@ -1,8 +1,10 @@
 """PDF Merger blueprint — combine multiple PDFs into one."""
 import os
+from io import BytesIO
 
 from flask import Blueprint, render_template, request, send_file, flash, redirect, url_for
 
+from core.file_utils import archive_session
 from . import service
 
 bp = Blueprint('pdf_merger', __name__, url_prefix='/pdf/merger')
@@ -39,9 +41,29 @@ def merge():
     output_path = service.unique_path(service.MERGER_OUTPUT, safe_output)
     service.merge_pdfs(input_paths, output_path)
 
+    # Send an in-memory copy so we don't keep a handle on the saved file
+    # (this lets the Archive button move output/ afterwards on Windows). The
+    # merged PDF still persists on disk in output/pdf_merger/ for archiving.
+    buffer = BytesIO()
+    with open(output_path, "rb") as fh:
+        buffer.write(fh.read())
+    buffer.seek(0)
+
     return send_file(
-        output_path,
+        buffer,
         as_attachment=True,
         download_name=os.path.basename(output_path),
         mimetype="application/pdf",
     )
+
+
+@bp.route('/archive', methods=['POST'])
+def archive():
+    # Same global archive behavior as the PDF Splitter: moves the whole
+    # input/ and output/ workspace into old/archive_<timestamp>/.
+    archive_name = archive_session()
+    if archive_name is None:
+        flash("Nothing to archive! Input and Output folders are already empty.")
+    else:
+        flash(f"Successfully archived session into old/{archive_name}/ !")
+    return redirect(url_for('pdf_merger.index'))

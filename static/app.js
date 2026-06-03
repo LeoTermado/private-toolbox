@@ -10,6 +10,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     });
 
+    // Ask for confirmation before submitting any form with a data-confirm message
+    // (used by the Archive buttons on PDF Splitter and PDF Merger).
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (!window.confirm(form.getAttribute('data-confirm'))) {
+                e.preventDefault();
+            }
+        });
+    });
+
     initPdfMerger();
 });
 

@@ -20,8 +20,47 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    initThemeToggle();
+    initSidebarAccordion();
     initPdfMerger();
 });
+
+// ---- Theme toggle ----
+// The initial theme is set by an inline script in <head> (before paint). Here we
+// only flip the data-theme attribute on click and persist the choice.
+function initThemeToggle() {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        var next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+}
+
+// ---- Sidebar accordion ----
+// Single-open: clicking a category header expands it and collapses the others,
+// keeping the sidebar compact. The category for the current page starts open
+// (server-rendered); on the home page we open the first category by default.
+function initSidebarAccordion() {
+    var groups = Array.prototype.slice.call(document.querySelectorAll('.nav-group'));
+    if (!groups.length) return;
+
+    if (!groups.some(function (g) { return g.classList.contains('open'); })) {
+        groups[0].classList.add('open');
+    }
+
+    groups.forEach(function (group) {
+        var header = group.querySelector('.nav-group-header');
+        if (!header) return;
+        header.addEventListener('click', function () {
+            var isOpen = group.classList.contains('open');
+            groups.forEach(function (g) { g.classList.remove('open'); });
+            if (!isOpen) group.classList.add('open');
+        });
+    });
+}
 
 // ---- PDF Merger: file list with reorder / remove ----
 // Maintains a selectedFiles array and syncs it back to the file input via a

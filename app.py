@@ -61,6 +61,43 @@ TOOLS = [
     {"endpoint": "document_transpiler.index", "path": "/documents/transpiler/", "label": "Advanced Document Transpiler", "icon": "📑", "implemented": False},
 ]
 
+# Category grouping for the sidebar accordion and the home dashboard sections.
+# Both render from this single ordering, so they always match. Each entry is
+# (category name, [tool endpoints in display order]).
+TOOL_CATEGORIES = [
+    ("Document & PDF Tools", [
+        "pdf_splitter.index", "pdf_merger.index", "pdf_compressor.index",
+        "pdf_password_guard.index", "pdf_metadata_purge.index",
+        "image_to_pdf.index", "pdf_to_image.index", "document_redactor.index",
+        "document_transpiler.index",
+    ]),
+    ("Image Tools", [
+        "image_format_changer.index", "image_resizer_compressor.index",
+        "photo_exif_scrubber.index", "background_eraser.index",
+    ]),
+    ("Text, Data & Security", [
+        "text_cleaner.index", "structured_data_beautifier.index",
+        "file_checksum_generator.index", "secure_key_generator.index",
+    ]),
+    ("File & Archive Tools", [
+        "file_renamer.index", "zip_splitter.index", "archive_content_inspector.index",
+    ]),
+    ("OCR & Media Tools", [
+        "ocr_organizer.index", "media_converter.index", "video_trimmer_animation.index",
+    ]),
+]
+
+_TOOLS_BY_ENDPOINT = {tool["endpoint"]: tool for tool in TOOLS}
+
+
+def build_categories():
+    """Resolve TOOL_CATEGORIES into [{name, tools: [tool dict, ...]}, ...]."""
+    categories = []
+    for name, endpoints in TOOL_CATEGORIES:
+        items = [_TOOLS_BY_ENDPOINT[e] for e in endpoints if e in _TOOLS_BY_ENDPOINT]
+        categories.append({"name": name, "tools": items})
+    return categories
+
 
 def create_app():
     app = Flask(__name__)
@@ -72,7 +109,7 @@ def create_app():
     # Expose the tool registry to every template (sidebar + cards).
     @app.context_processor
     def inject_tools():
-        return {"tools": TOOLS}
+        return {"tools": TOOLS, "categories": build_categories()}
 
     # Homepage / dashboard.
     @app.route('/')

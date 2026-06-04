@@ -7,16 +7,26 @@
     <p class="subtitle">A local collection of file &amp; document utilities. Pick a tool to get started.</p>
 </header>
 
-<div class="card-grid">
-    {% for tool in tools %}
-    <a class="card {% if not tool.implemented %}card-disabled{% endif %}"
-       href="{{ url_for(tool.endpoint) }}">
-        <div class="card-icon">{{ tool.icon }}</div>
-        <div class="card-title">{{ tool.label }}</div>
-        <div class="card-status">
-            {% if tool.implemented %}Ready{% else %}Coming soon{% endif %}
-        </div>
-    </a>
-    {% endfor %}
+<div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" placeholder="Search tools..." aria-label="Search tools">
 </div>
+
+{% for cat in categories %}
+<section class="tool-category">
+    <h2 class="category-heading">{{ cat.name }}</h2>
+    <div class="card-grid">
+        {% for tool in cat.tools %}
+        <a class="card {% if not tool.implemented %}card-disabled{% endif %}"
+           href="{{ url_for(tool.endpoint) }}">
+            <div class="card-icon">{{ tool.icon }}</div>
+            <div class="card-title">{{ tool.label }}</div>
+            <div class="card-status">
+                {% if tool.implemented %}Ready{% else %}<span class="badge">soon</span>{% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
 {% endblock %}

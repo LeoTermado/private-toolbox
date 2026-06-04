@@ -1,7 +1,7 @@
 """Private Toolbox — Flask application factory.
 
 Builds the app, wires up the shared tool registry (used by the sidebar and the
-dashboard cards), and registers every tool blueprint. Only the PDF Splitter is
+dashboard cards), and registers every tool blueprint. Only the PDF Splitter and Merger are
 functional; the rest render a placeholder page.
 """
 from flask import Flask, render_template, redirect, url_for
@@ -19,6 +19,19 @@ from tools.text_cleaner.routes import bp as text_cleaner_bp
 from tools.zip_splitter.routes import bp as zip_splitter_bp
 from tools.ocr_organizer.routes import bp as ocr_organizer_bp
 from tools.document_redactor.routes import bp as document_redactor_bp
+from tools.pdf_password_guard.routes import bp as pdf_password_guard_bp
+from tools.pdf_metadata_purge.routes import bp as pdf_metadata_purge_bp
+from tools.image_format_changer.routes import bp as image_format_changer_bp
+from tools.image_resizer_compressor.routes import bp as image_resizer_compressor_bp
+from tools.photo_exif_scrubber.routes import bp as photo_exif_scrubber_bp
+from tools.structured_data_beautifier.routes import bp as structured_data_beautifier_bp
+from tools.file_checksum_generator.routes import bp as file_checksum_generator_bp
+from tools.secure_key_generator.routes import bp as secure_key_generator_bp
+from tools.archive_content_inspector.routes import bp as archive_content_inspector_bp
+from tools.media_converter.routes import bp as media_converter_bp
+from tools.video_trimmer_animation.routes import bp as video_trimmer_animation_bp
+from tools.background_eraser.routes import bp as background_eraser_bp
+from tools.document_transpiler.routes import bp as document_transpiler_bp
 
 # Single source of truth for the sidebar + dashboard cards.
 # endpoint -> Flask endpoint for url_for; path -> resolved URL (for active highlight).
@@ -33,6 +46,19 @@ TOOLS = [
     {"endpoint": "zip_splitter.index",     "path": "/files/zip-splitter/", "label": "ZIP Splitter",    "icon": "📦", "implemented": False},
     {"endpoint": "ocr_organizer.index",    "path": "/ocr/organizer/",    "label": "OCR Organizer",     "icon": "🔍", "implemented": False},
     {"endpoint": "document_redactor.index", "path": "/privacy/redactor/", "label": "Document Redactor", "icon": "🕵️", "implemented": False},
+    {"endpoint": "pdf_password_guard.index", "path": "/pdf/password-guard/", "label": "PDF Password Guard", "icon": "🔒", "implemented": False},
+    {"endpoint": "pdf_metadata_purge.index", "path": "/pdf/metadata-purge/", "label": "PDF Metadata Purge", "icon": "🧽", "implemented": False},
+    {"endpoint": "image_format_changer.index", "path": "/image/format-changer/", "label": "Universal Image Format Changer", "icon": "🔄", "implemented": False},
+    {"endpoint": "image_resizer_compressor.index", "path": "/image/resizer-compressor/", "label": "Image Resizer & Compressor", "icon": "📐", "implemented": False},
+    {"endpoint": "photo_exif_scrubber.index", "path": "/image/exif-scrubber/", "label": "Photo EXIF Scrubber", "icon": "🧼", "implemented": False},
+    {"endpoint": "structured_data_beautifier.index", "path": "/data/beautifier/", "label": "Structured Data Beautifier", "icon": "✨", "implemented": False},
+    {"endpoint": "file_checksum_generator.index", "path": "/files/checksum/", "label": "File Checksum Generator", "icon": "🔢", "implemented": False},
+    {"endpoint": "secure_key_generator.index", "path": "/security/key-generator/", "label": "Secure Key Generator", "icon": "🔑", "implemented": False},
+    {"endpoint": "archive_content_inspector.index", "path": "/files/archive-inspector/", "label": "Archive Content Inspector", "icon": "🗃️", "implemented": False},
+    {"endpoint": "media_converter.index", "path": "/media/converter/", "label": "Audio & Video Converter", "icon": "🎬", "implemented": False},
+    {"endpoint": "video_trimmer_animation.index", "path": "/media/video-trimmer/", "label": "Video Snippet Trimmer & Animation Creator", "icon": "✂️", "implemented": False},
+    {"endpoint": "background_eraser.index", "path": "/image/background-eraser/", "label": "Automated Asset Background Eraser", "icon": "🪄", "implemented": False},
+    {"endpoint": "document_transpiler.index", "path": "/documents/transpiler/", "label": "Advanced Document Transpiler", "icon": "📑", "implemented": False},
 ]
 
 
@@ -58,6 +84,11 @@ def create_app():
         pdf_splitter_bp, pdf_merger_bp, pdf_compressor_bp, image_to_pdf_bp,
         pdf_to_image_bp, file_renamer_bp, text_cleaner_bp, zip_splitter_bp,
         ocr_organizer_bp, document_redactor_bp,
+        pdf_password_guard_bp, pdf_metadata_purge_bp, image_format_changer_bp,
+        image_resizer_compressor_bp, photo_exif_scrubber_bp,
+        structured_data_beautifier_bp, file_checksum_generator_bp,
+        secure_key_generator_bp, archive_content_inspector_bp, media_converter_bp,
+        video_trimmer_animation_bp, background_eraser_bp, document_transpiler_bp,
     ):
         app.register_blueprint(bp)
 

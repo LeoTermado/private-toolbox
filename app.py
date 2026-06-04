@@ -38,7 +38,7 @@ from tools.document_transpiler.routes import bp as document_transpiler_bp
 TOOLS = [
     {"endpoint": "pdf_splitter.index",     "path": "/pdf/splitter/",     "label": "PDF Splitter",      "icon": "📄", "implemented": True},
     {"endpoint": "pdf_merger.index",       "path": "/pdf/merger/",       "label": "PDF Merger",        "icon": "🔗", "implemented": True},
-    {"endpoint": "pdf_compressor.index",   "path": "/pdf/compressor/",   "label": "PDF Compressor",    "icon": "🗜️", "implemented": False},
+    {"endpoint": "pdf_compressor.index",   "path": "/pdf/compressor/",   "label": "PDF Compressor",    "icon": "🗜️", "implemented": True},
     {"endpoint": "image_to_pdf.index",     "path": "/image/to-pdf/",     "label": "Image to PDF",      "icon": "🖼️", "implemented": False},
     {"endpoint": "pdf_to_image.index",     "path": "/pdf/to-image/",     "label": "PDF to Image",      "icon": "🏞️", "implemented": False},
     {"endpoint": "file_renamer.index",     "path": "/files/renamer/",    "label": "File Renamer",      "icon": "✏️", "implemented": False},

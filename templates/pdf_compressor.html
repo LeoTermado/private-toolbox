@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}PDF Compressor — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>🗜️ PDF Compressor</h1>
+    <p class="subtitle">Reduce PDF file size while keeping the document usable.</p>
+</header>
+
+{% if gs.available %}
+<div class="status-card ok">
+    <span class="status-dot"></span>
+    <div>
+        Ghostscript detected. Strong PDF compression is available.
+        {% if gs.command %}<span class="status-detail">({{ gs.command }})</span>{% endif %}
+        <a class="status-link" href="{{ url_for('pdf_compressor.ghostscript_help') }}">Why do I need Ghostscript?</a>
+    </div>
+</div>
+{% else %}
+<div class="status-card warn">
+    <span class="status-dot"></span>
+    <div>
+        Ghostscript not detected. The compressor will use basic fallback compression, which may be weaker.
+        <a class="status-link" href="{{ url_for('pdf_compressor.ghostscript_help') }}">Why do I need Ghostscript?</a>
+    </div>
+</div>
+{% endif %}
+
+<div class="panel">
+    <form action="{{ url_for('pdf_compressor.compress') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select PDF File</label>
+            <input type="file" id="file" name="file" accept=".pdf" required>
+        </div>
+
+        <div class="form-group">
+            <label for="level">Compression Level</label>
+            <select id="level" name="level" class="select-input">
+                {% for value, label in levels %}
+                <option value="{{ value }}" {% if value == selected_level %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <p class="hint">Compression results depend on the PDF content. Text-based or already optimized PDFs may not shrink much more at higher levels.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="output_name">Output File Name <span class="hint-inline">(optional)</span></label>
+            <input type="text" id="output_name" name="output_name" placeholder="e.g., report_compressed">
+            <p class="hint">Leave blank to use the original name with &ldquo;_compressed&rdquo;.</p>
+        </div>
+
+        <button type="submit" class="btn">🗜️ Compress PDF</button>
+    </form>
+
+    <form action="{{ url_for('pdf_compressor.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">Compression complete</h2>
+
+    {% if not result.smaller %}
+    <div class="result-warning">
+        The compressed file is not smaller than the original — your PDF may already be optimized.
+    </div>
+    {% endif %}
+
+    <div class="result-stats">
+        <div class="result-stat">
+            <span class="result-stat-label">Original</span>
+            <span class="result-stat-value">{{ result.original_human }}</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Compressed</span>
+            <span class="result-stat-value">{{ result.output_human }}</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Saved</span>
+            <span class="result-stat-value">{{ result.saved_human }} ({{ result.saved_percent }}%)</span>
+        </div>
+    </div>
+
+    {% if result.basic_used %}
+    <p class="hint">Note: Ghostscript was not found, so a basic built-in compression was used.
+    Install Ghostscript for stronger results.</p>
+    {% endif %}
+
+    <a class="btn" href="{{ url_for('pdf_compressor.download', filename=result.download_name) }}">Download compressed PDF</a>
+</div>
+{% endif %}
+{% endblock %}

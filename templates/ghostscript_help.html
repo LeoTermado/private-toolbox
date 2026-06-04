@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Why do I need Ghostscript? — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>Why do I need Ghostscript?</h1>
+</header>
+
+<div class="panel">
+    <p>Ghostscript helps this toolbox perform stronger PDF compression. A full
+    Ghostscript download and installation tutorial will be added here.</p>
+
+    <p class="hint">After installing Ghostscript, restart the Flask app and reopen
+    the PDF Compressor page.</p>
+
+    <a class="btn-link" href="{{ url_for('pdf_compressor.index') }}">&larr; Back to PDF Compressor</a>
+</div>
+{% endblock %}

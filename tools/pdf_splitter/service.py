@@ -3,13 +3,10 @@
 Thin tool layer over the shared core helpers (core.paths, core.uploads,
 core.pdf_utils). The web layer in routes.py only handles request/response.
 """
-import os
-import zipfile
-from io import BytesIO
-
 from core.paths import tool_input_dir, tool_output_dir, ensure_tool_folders
 from core.uploads import save_upload as _save_upload
 from core.pdf_utils import split_pdf_by_ranges
+from core.archive_utils import zip_files_to_buffer
 
 TOOL_SLUG = "pdf_splitter"
 
@@ -41,11 +38,4 @@ def split_pdf(input_path, range_string):
 
 def build_zip(created_files):
     """Bundle the created split files into an in-memory ZIP and return it."""
-    zip_buffer = BytesIO()
-
-    with zipfile.ZipFile(zip_buffer, 'w') as zipf:
-        for f in created_files:
-            zipf.write(f, os.path.basename(f))
-
-    zip_buffer.seek(0)
-    return zip_buffer
+    return zip_files_to_buffer(created_files)

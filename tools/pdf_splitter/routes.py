@@ -1,7 +1,9 @@
 """PDF Splitter blueprint — the one fully functional tool."""
-from flask import Blueprint, render_template, request, send_file, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 
 from core.file_utils import archive_session
+from core.downloads import send_zip_download
+from core.validators import is_pdf_filename
 from . import service
 
 bp = Blueprint('pdf_splitter', __name__, url_prefix='/pdf/splitter')
@@ -20,7 +22,7 @@ def split():
     file = request.files['file']
     range_string = request.form.get('ranges')
 
-    if file.filename == '' or not file.filename.lower().endswith('.pdf'):
+    if file.filename == '' or not is_pdf_filename(file.filename):
         return "Invalid file format. Please upload a PDF.", 400
 
     # Save the upload, then split. Files persist in input/ and output/ until archived.
@@ -31,12 +33,7 @@ def split():
         return "No valid pages were extracted. Check your page range values.", 400
 
     zip_buffer = service.build_zip(created_files)
-    return send_file(
-        zip_buffer,
-        as_attachment=True,
-        download_name="split_pdfs.zip",
-        mimetype="application/zip",
-    )
+    return send_zip_download(zip_buffer, "split_pdfs.zip")
 
 
 @bp.route('/archive', methods=['POST'])

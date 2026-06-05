@@ -369,6 +369,82 @@ select.select-input:focus {
 .file-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .file-btn-remove:hover:not(:disabled) { background: #fde8e8; border-color: #e53e3e; color: #c53030; }
 
+/* Ghostscript help / tutorial page */
+.help-page { max-width: 820px; }
+.help-back { margin-bottom: 22px; }
+
+.help-nav { margin-bottom: 24px; }
+.help-nav h2 {
+    margin: 0 0 14px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+}
+.help-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 6px 18px;
+}
+.help-nav a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+}
+.help-nav a:hover { text-decoration: underline; }
+
+.help-section { margin-bottom: 22px; }
+/* Leave breathing room when jumping to an anchored heading. */
+.help-section h2 { scroll-margin-top: 20px; }
+.help-section h2 {
+    margin: 0 0 14px;
+    font-size: 20px;
+}
+.help-section h3 {
+    margin: 18px 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+.help-section p { margin: 0 0 12px; line-height: 1.6; }
+.help-section p:last-child { margin-bottom: 0; }
+.help-section ul, .help-section ol { margin: 0 0 12px; padding-left: 22px; line-height: 1.6; }
+.help-section li { margin-bottom: 4px; }
+.help-section li:last-child { margin-bottom: 0; }
+.help-section a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.help-section a:hover { text-decoration: underline; }
+
+/* Inline + block code/commands inside the help page */
+.help-section code {
+    background: var(--subtle-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'Consolas', 'SFMono-Regular', Menlo, monospace;
+    font-size: 13px;
+    color: var(--text);
+}
+.help-section pre {
+    background: var(--subtle-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin: 0 0 12px;
+    overflow-x: auto;
+}
+.help-section pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre;
+}
+
 /* Flash messages */
 .alert {
     padding: 12px 16px;

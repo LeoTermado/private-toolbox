@@ -53,7 +53,7 @@ TOOLS = [
     {"endpoint": "photo_exif_scrubber.index", "path": "/image/exif-scrubber/", "label": "Photo EXIF Scrubber", "icon": "🧼", "implemented": False},
     {"endpoint": "structured_data_beautifier.index", "path": "/data/beautifier/", "label": "Structured Data Beautifier", "icon": "✨", "implemented": False},
     {"endpoint": "file_checksum_generator.index", "path": "/files/checksum/", "label": "File Checksum Generator", "icon": "🔢", "implemented": False},
-    {"endpoint": "secure_key_generator.index", "path": "/security/key-generator/", "label": "Secure Key Generator", "icon": "🔑", "implemented": False},
+    {"endpoint": "secure_key_generator.index", "path": "/security/key-generator/", "label": "Secure Key Generator", "icon": "🔑", "implemented": True},
     {"endpoint": "archive_content_inspector.index", "path": "/files/archive-inspector/", "label": "Archive Content Inspector", "icon": "🗃️", "implemented": False},
     {"endpoint": "media_converter.index", "path": "/media/converter/", "label": "Audio & Video Converter", "icon": "🎬", "implemented": False},
     {"endpoint": "video_trimmer_animation.index", "path": "/media/video-trimmer/", "label": "Video Snippet Trimmer & Animation Creator", "icon": "✂️", "implemented": False},

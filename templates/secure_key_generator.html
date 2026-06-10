@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+{% block title %}Secure Key Generator — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>🔑 Secure Key Generator</h1>
+    <p class="subtitle">Generate passwords, keys, tokens and passphrases locally. Nothing is uploaded or saved.</p>
+</header>
+
+<div class="status-card ok">
+    <span class="status-dot"></span>
+    <div>
+        Generation happens entirely on your machine using Python's <code class="inline-code">secrets</code> module.
+        Values are shown only in your browser and are never stored, logged or sent anywhere.
+    </div>
+</div>
+
+{% if error %}
+<div class="alert" id="skg-error" tabindex="-1" role="alert">{{ error }}</div>
+{% endif %}
+
+<div class="panel panel-wide">
+    <form action="{{ url_for('secure_key_generator.generate') }}" method="POST" id="skg-form">
+
+        <div class="form-group">
+            <label for="preset">Preset</label>
+            <select id="preset" name="preset" class="select-input">
+                {% for key, p in presets.items() %}
+                <option value="{{ key }}" {% if opts.preset == key %}selected{% endif %}>{{ p.label }}</option>
+                {% endfor %}
+                <option value="other" {% if opts.preset == 'other' %}selected{% endif %}>Custom / Other</option>
+            </select>
+            <p class="hint" id="preset-help">A preset only fills in sensible settings for a use case — you can still edit everything below. Editing switches the preset to “Custom / Other”.</p>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="mode">Mode</label>
+                <select id="mode" name="mode" class="select-input">
+                    <option value="password" {% if opts.mode == 'password' %}selected{% endif %}>Password</option>
+                    <option value="hex_key" {% if opts.mode == 'hex_key' %}selected{% endif %}>Hex key</option>
+                    <option value="base64_key" {% if opts.mode == 'base64_key' %}selected{% endif %}>Base64 key</option>
+                    <option value="urlsafe_token" {% if opts.mode == 'urlsafe_token' %}selected{% endif %}>URL-safe token</option>
+                    <option value="numeric" {% if opts.mode == 'numeric' %}selected{% endif %}>Numeric PIN</option>
+                    <option value="recovery_codes" {% if opts.mode == 'recovery_codes' %}selected{% endif %}>Recovery codes</option>
+                    <option value="passphrase" {% if opts.mode == 'passphrase' %}selected{% endif %}>Memorable passphrase</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="count">Count <span class="hint-inline">(how many to generate)</span></label>
+                <input type="number" id="count" name="count" min="{{ limits.count_min }}" max="{{ limits.count_max }}" value="{{ opts.count }}">
+            </div>
+        </div>
+
+        <!-- ===== Password options ===== -->
+        <fieldset class="mode-group" data-mode-group="password">
+            <legend>Password options</legend>
+
+            <div class="form-group">
+                <label for="length">Length</label>
+                <input type="number" id="length" name="length" min="{{ limits.password_len_min }}" max="{{ limits.password_len_max }}" value="{{ opts.length }}">
+            </div>
+
+            <div class="form-group">
+                <span class="group-label">Character groups</span>
+                <div class="check-grid">
+                    <label class="check"><input type="checkbox" name="uppercase" {% if opts.uppercase %}checked{% endif %}> Uppercase (A–Z)</label>
+                    <label class="check"><input type="checkbox" name="lowercase" {% if opts.lowercase %}checked{% endif %}> Lowercase (a–z)</label>
+                    <label class="check"><input type="checkbox" name="numbers" {% if opts.numbers %}checked{% endif %}> Numbers (0–9)</label>
+                    <label class="check"><input type="checkbox" name="symbols" {% if opts.symbols %}checked{% endif %}> Symbols</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="group-label">Exclusions &amp; rules</span>
+                <div class="check-grid">
+                    <label class="check"><input type="checkbox" name="exclude_ambiguous" {% if opts.exclude_ambiguous %}checked{% endif %}> Exclude look-alike characters (0 O o 1 l I |)</label>
+                    <label class="check"><input type="checkbox" name="exclude_shell_unfriendly" {% if opts.exclude_shell_unfriendly %}checked{% endif %}> Exclude shell/config-unfriendly characters</label>
+                    <label class="check"><input type="checkbox" name="allow_repeats" {% if opts.allow_repeats %}checked{% endif %}> Allow repeated characters</label>
+                    <label class="check"><input type="checkbox" name="allow_spaces" {% if opts.allow_spaces %}checked{% endif %}> Allow spaces</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="custom_symbols">Custom allowed symbols <span class="hint-inline">(optional — overrides the default symbol set)</span></label>
+                <input type="text" id="custom_symbols" name="custom_symbols" value="{{ opts.custom_symbols }}" placeholder="e.g. !@#%-_">
+            </div>
+
+            <div class="form-group">
+                <span class="group-label">Minimum required characters <span class="hint-inline">(0 = no minimum)</span></span>
+                <div class="form-row mins-row">
+                    <label class="mini">Upper<input type="number" name="min_upper" min="0" value="{{ opts.min_upper }}"></label>
+                    <label class="mini">Lower<input type="number" name="min_lower" min="0" value="{{ opts.min_lower }}"></label>
+                    <label class="mini">Number<input type="number" name="min_number" min="0" value="{{ opts.min_number }}"></label>
+                    <label class="mini">Symbol<input type="number" name="min_symbol" min="0" value="{{ opts.min_symbol }}"></label>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- ===== Hex / Base64 / URL-safe token options ===== -->
+        <fieldset class="mode-group" data-mode-group="hex_key base64_key urlsafe_token">
+            <legend>Key / token options</legend>
+
+            <div class="form-group">
+                <label for="byte_length">Byte length</label>
+                <input type="number" id="byte_length" name="byte_length" min="{{ limits.byte_len_min }}" max="{{ limits.byte_len_max }}" value="{{ opts.byte_length }}">
+                <p class="hint" data-mode-hint="hex_key">Each byte produces 2 hex characters (e.g. 32 bytes → 64 hex chars = 256 bits).</p>
+                <p class="hint" data-mode-hint="base64_key">Raw bytes Base64-encoded on a single line (32 bytes = 256 bits).</p>
+                <p class="hint" data-mode-hint="urlsafe_token">Encoded output is longer than the byte length because of URL-safe encoding.</p>
+            </div>
+
+            <div class="form-group" data-mode-sub="base64_key">
+                <label for="base64_variant">Base64 variant</label>
+                <select id="base64_variant" name="base64_variant" class="select-input">
+                    <option value="urlsafe" {% if opts.base64_urlsafe %}selected{% endif %}>URL-safe (- and _)</option>
+                    <option value="standard" {% if not opts.base64_urlsafe %}selected{% endif %}>Standard (+ and /)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="prefix">Prefix <span class="hint-inline">(optional, e.g. dev_sk_)</span></label>
+                <input type="text" id="prefix" name="prefix" value="{{ opts.prefix }}" maxlength="{{ limits.prefix_max }}" placeholder="dev_sk_">
+                <p class="hint">A prefix is for labelling only — it does not add security and is not counted in entropy.</p>
+            </div>
+        </fieldset>
+
+        <!-- ===== Numeric PIN options ===== -->
+        <fieldset class="mode-group" data-mode-group="numeric">
+            <legend>Numeric PIN options</legend>
+            <div class="form-group">
+                <label for="numeric_length">PIN length</label>
+                <input type="number" id="numeric_length" name="numeric_length" min="{{ limits.numeric_len_min }}" max="{{ limits.numeric_len_max }}" value="{{ opts.numeric_length }}">
+                <p class="hint">⚠️ Numeric PINs have low entropy. Use them only for short-lived, temporary codes — never as long-term secrets.</p>
+            </div>
+        </fieldset>
+
+        <!-- ===== Recovery codes options ===== -->
+        <fieldset class="mode-group" data-mode-group="recovery_codes">
+            <legend>Recovery code options</legend>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="rc_length">Code length <span class="hint-inline">(excludes separators)</span></label>
+                    <input type="number" id="rc_length" name="rc_length" min="{{ limits.rc_len_min }}" max="{{ limits.rc_len_max }}" value="{{ opts.rc_length }}">
+                </div>
+                <div class="form-group">
+                    <label for="rc_group_size">Group size</label>
+                    <input type="number" id="rc_group_size" name="rc_group_size" min="{{ limits.rc_group_min }}" max="{{ limits.rc_group_max }}" value="{{ opts.rc_group_size }}">
+                </div>
+                <div class="form-group">
+                    <label for="rc_separator">Separator</label>
+                    <select id="rc_separator" name="rc_separator" class="select-input">
+                        <option value="-" {% if opts.rc_separator == '-' %}selected{% endif %}>Hyphen ( - )</option>
+                        <option value="_" {% if opts.rc_separator == '_' %}selected{% endif %}>Underscore ( _ )</option>
+                        <option value="." {% if opts.rc_separator == '.' %}selected{% endif %}>Dot ( . )</option>
+                    </select>
+                </div>
+            </div>
+            <p class="hint">Codes use uppercase letters and digits, with look-alike characters excluded.</p>
+        </fieldset>
+
+        <!-- ===== Passphrase options ===== -->
+        <fieldset class="mode-group" data-mode-group="passphrase">
+            <legend>Passphrase options</legend>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="word_count">Word count</label>
+                    <input type="number" id="word_count" name="word_count" min="{{ limits.word_min }}" max="{{ limits.word_max }}" value="{{ opts.word_count }}">
+                </div>
+                <div class="form-group">
+                    <label for="pp_separator">Separator</label>
+                    <select id="pp_separator" name="pp_separator" class="select-input">
+                        <option value="hyphen" {% if opts.pp_separator == 'hyphen' %}selected{% endif %}>Hyphen ( - )</option>
+                        <option value="underscore" {% if opts.pp_separator == 'underscore' %}selected{% endif %}>Underscore ( _ )</option>
+                        <option value="dot" {% if opts.pp_separator == 'dot' %}selected{% endif %}>Dot ( . )</option>
+                        <option value="space" {% if opts.pp_separator == 'space' %}selected{% endif %}>Space</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pp_capitalize">Capitalization</label>
+                    <select id="pp_capitalize" name="pp_capitalize" class="select-input">
+                        <option value="none" {% if opts.pp_capitalize == 'none' %}selected{% endif %}>none</option>
+                        <option value="title" {% if opts.pp_capitalize == 'title' %}selected{% endif %}>Title Case</option>
+                        <option value="upper" {% if opts.pp_capitalize == 'upper' %}selected{% endif %}>UPPERCASE</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="check"><input type="checkbox" name="pp_add_number" {% if opts.pp_add_number %}checked{% endif %}> Append a random number</label>
+            </div>
+            <p class="hint">Words are chosen with <code class="inline-code">secrets</code> from a local list of {{ wordlist_size }} words (not the official Diceware list).</p>
+        </fieldset>
+
+        <!-- ===== Output ===== -->
+        <fieldset class="mode-group" data-mode-group="all">
+            <legend>Output</legend>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="output_template">Output format</label>
+                    <select id="output_template" name="output_template" class="select-input">
+                        <option value="plain" {% if opts.output_template == 'plain' %}selected{% endif %}>Plain</option>
+                        <option value="plain_list" {% if opts.output_template == 'plain_list' %}selected{% endif %}>Plain list</option>
+                        <option value="env" {% if opts.output_template == 'env' %}selected{% endif %}>.env</option>
+                        <option value="json" {% if opts.output_template == 'json' %}selected{% endif %}>JSON</option>
+                        <option value="yaml" {% if opts.output_template == 'yaml' %}selected{% endif %}>YAML</option>
+                        <option value="java" {% if opts.output_template == 'java' %}selected{% endif %}>Java constant</option>
+                        <option value="python" {% if opts.output_template == 'python' %}selected{% endif %}>Python assignment</option>
+                    </select>
+                </div>
+                <div class="form-group" data-varname-group>
+                    <label for="variable_name">Variable name</label>
+                    <input type="text" id="variable_name" name="variable_name" value="{{ opts.variable_name }}" maxlength="{{ limits.varname_max }}" placeholder="SECRET_KEY">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="check"><input type="checkbox" name="hide_result" {% if opts.hide_result %}checked{% endif %}> Hide generated values by default (reveal individually)</label>
+            </div>
+        </fieldset>
+
+        <button type="submit" class="btn">🔑 Generate</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card" id="skg-result" data-hide="{{ 'true' if opts.hide_result else 'false' }}">
+    <div class="result-head">
+        <h2 class="result-title">Generated {{ result.count }} value{{ 's' if result.count != 1 else '' }}</h2>
+        <button type="button" class="key-btn js-master-reveal" id="master-reveal" aria-pressed="false">👁 Reveal all</button>
+    </div>
+
+    <div class="entropy-bar entropy-{{ result.entropy.label | replace(' ', '-') }}">
+        <div class="entropy-main">
+            <span class="entropy-bits">≈ {{ result.entropy.bits }} bits</span>
+            <span class="entropy-label">{{ result.entropy.label }}</span>
+        </div>
+        <span class="entropy-detail">{{ result.entropy.detail }} · estimated, per value</span>
+    </div>
+
+    <ol class="key-list">
+        {% for v in result['values'] %}
+        <li class="key-row">
+            <code class="key-value" data-secret="{{ v }}">{{ result['masked_values'][loop.index0] if opts.hide_result else v }}</code>
+            <div class="key-row-actions">
+                <button type="button" class="key-btn js-reveal" aria-label="Reveal value">👁</button>
+                <button type="button" class="key-btn js-copy-one">Copy</button>
+            </div>
+        </li>
+        {% endfor %}
+    </ol>
+
+    <div class="formatted-output">
+        <div class="format-tabs" role="group" aria-label="Output format">
+            <button type="button" class="format-tab" data-format="plain_list">Plain</button>
+            <button type="button" class="format-tab" data-format="env">.env</button>
+            <button type="button" class="format-tab" data-format="json">JSON</button>
+            <button type="button" class="format-tab" data-format="yaml">YAML</button>
+            <button type="button" class="format-tab" data-format="java">Java</button>
+            <button type="button" class="format-tab" data-format="python">Python</button>
+            <button type="button" class="btn-mini js-copy-formatted" id="copy-formatted">Copy all</button>
+        </div>
+        <pre class="format-pre"><code id="format-display">{{ result.masked_output if opts.hide_result else result.selected_output }}</code></pre>
+    </div>
+
+    <p class="hint" id="copy-status" aria-live="polite"></p>
+</div>
+
+<script type="application/json" id="skg-formats">{{ result.formats | tojson }}</script>
+<script type="application/json" id="skg-formats-masked">{{ result.formats_masked | tojson }}</script>
+{% endif %}
+
+<div class="safety-note">
+    <strong>Safety note.</strong> Generated secrets are created locally and are not saved by the app.
+    Store important secrets in a password manager. Do not share generated secrets, and do not paste them
+    into public chats, tickets, screenshots or repositories.
+</div>
+
+<script type="application/json" id="skg-presets">{{ presets_json | tojson }}</script>
+<script>window.SKG_SELECTED_FORMAT = {{ opts.output_template | tojson }};</script>
+{% endblock %}

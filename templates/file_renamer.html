@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}File Renamer — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>✏️ File Renamer</h1>
+    <p class="subtitle">Batch-rename files and download them as a ZIP.</p>
+</header>
+
+<div class="panel">
+    <form action="{{ url_for('file_renamer.rename') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="files">Select File(s)</label>
+            <input type="file" id="files" name="files" multiple required>
+        </div>
+
+        <div class="form-group">
+            <label for="mode">Rename Mode</label>
+            <select id="mode" name="mode" class="select-input">
+                {% for value, label in modes %}
+                <option value="{{ value }}" {% if value == selected_mode %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="base_name">Base Name <span class="hint-inline">(sequence mode)</span></label>
+            <input type="text" id="base_name" name="base_name" placeholder="e.g., vacation">
+            <p class="hint">Produces names like vacation_01, vacation_02 … (extensions are kept).</p>
+        </div>
+
+        <div class="form-group">
+            <label for="start">Start Number <span class="hint-inline">(sequence mode)</span></label>
+            <input type="number" id="start" name="start" value="1" min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="prefix">Prefix <span class="hint-inline">(prefix/suffix mode)</span></label>
+            <input type="text" id="prefix" name="prefix" placeholder="e.g., 2026_">
+        </div>
+
+        <div class="form-group">
+            <label for="suffix">Suffix <span class="hint-inline">(prefix/suffix mode)</span></label>
+            <input type="text" id="suffix" name="suffix" placeholder="e.g., _final">
+        </div>
+
+        <button type="submit" class="btn">✏️ Rename Files</button>
+    </form>
+
+    <form action="{{ url_for('file_renamer.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">Renamed {{ result.count }} file(s)</h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Original</th><th>New name</th></tr>
+            </thead>
+            <tbody>
+                {% for row in result.rows %}
+                <tr><td>{{ row.old }}</td><td>{{ row.new }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a class="btn" href="{{ url_for('file_renamer.download', filename=result.zip_name) }}">Download renamed files (.zip)</a>
+</div>
+{% endif %}
+{% endblock %}

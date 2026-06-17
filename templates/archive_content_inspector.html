@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Archive Content Inspector — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>🗃️ Archive Content Inspector</h1>
+    <p class="subtitle">Look inside a ZIP or TAR archive without extracting it.</p>
+</header>
+
+<div class="panel">
+    <form action="{{ url_for('archive_content_inspector.inspect') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select Archive</label>
+            <input type="file" id="file" name="file" accept=".zip,.tar,.gz,.tgz,.bz2,.xz" required>
+            <p class="hint">Supports .zip and .tar archives (including .tar.gz / .tgz). Read-only — nothing is extracted.</p>
+        </div>
+
+        <button type="submit" class="btn">🗃️ Inspect Archive</button>
+    </form>
+
+    <form action="{{ url_for('archive_content_inspector.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">{{ result.type }} archive — {{ result.file_count }} file(s)</h2>
+
+    <div class="result-stats">
+        <div class="result-stat">
+            <span class="result-stat-label">Files</span>
+            <span class="result-stat-value">{{ result.file_count }}</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Uncompressed</span>
+            <span class="result-stat-value">{{ result.total_human }}</span>
+        </div>
+        {% if result.compressed_human %}
+        <div class="result-stat">
+            <span class="result-stat-label">Compressed</span>
+            <span class="result-stat-value">{{ result.compressed_human }}</span>
+        </div>
+        {% endif %}
+        {% if result.ratio is not none %}
+        <div class="result-stat">
+            <span class="result-stat-label">Space saved</span>
+            <span class="result-stat-value">{{ result.ratio }}%</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if result.truncated %}
+    <p class="hint">Showing the first {{ result.shown_count }} entries.</p>
+    {% endif %}
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Name</th><th>Size</th><th>Compressed</th><th>Modified</th></tr>
+            </thead>
+            <tbody>
+                {% for e in result.entries %}
+                <tr>
+                    <td>{{ e.name }}</td>
+                    <td>{{ e.size_human }}</td>
+                    <td>{{ e.compressed_human }}</td>
+                    <td>{{ e.modified }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

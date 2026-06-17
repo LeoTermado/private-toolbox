@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Image Resizer & Compressor — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>📐 Image Resizer &amp; Compressor</h1>
+    <p class="subtitle">Shrink image dimensions and reduce file size while keeping aspect ratio.</p>
+</header>
+
+<div class="panel">
+    <form action="{{ url_for('image_resizer_compressor.process') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select Image</label>
+            <input type="file" id="file" name="file"
+                   accept=".png,.jpg,.jpeg,.webp,.bmp,.gif,.tiff,.tif" required>
+        </div>
+
+        <div class="form-group">
+            <label for="max_width">Max Width (px) <span class="hint-inline">(optional)</span></label>
+            <input type="number" id="max_width" name="max_width" min="1" placeholder="e.g., 1920">
+        </div>
+
+        <div class="form-group">
+            <label for="max_height">Max Height (px) <span class="hint-inline">(optional)</span></label>
+            <input type="number" id="max_height" name="max_height" min="1" placeholder="e.g., 1080">
+        </div>
+
+        <div class="form-group">
+            <label for="quality">Quality (1–100)</label>
+            <input type="number" id="quality" name="quality" min="1" max="100" value="{{ default_quality }}">
+            <p class="hint">Affects JPEG/WEBP output. Leave dimensions blank to only recompress.</p>
+        </div>
+
+        <button type="submit" class="btn">📐 Resize &amp; Compress</button>
+    </form>
+
+    <form action="{{ url_for('image_resizer_compressor.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">Image optimized</h2>
+
+    {% if not result.smaller %}
+    <div class="result-warning">
+        The output is not smaller than the original — try a lower quality or smaller dimensions.
+    </div>
+    {% endif %}
+
+    <div class="result-stats">
+        <div class="result-stat">
+            <span class="result-stat-label">Original</span>
+            <span class="result-stat-value">{{ result.original_human }}</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Optimized</span>
+            <span class="result-stat-value">{{ result.output_human }}</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Saved</span>
+            <span class="result-stat-value">{{ result.saved_human }} ({{ result.saved_percent }}%)</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Dimensions</span>
+            <span class="result-stat-value">{{ result.original_dims }} → {{ result.new_dims }}</span>
+        </div>
+    </div>
+
+    <a class="btn" href="{{ url_for('image_resizer_compressor.download', filename=result.download_name) }}">Download image</a>
+</div>
+{% endif %}
+{% endblock %}

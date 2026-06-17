@@ -299,6 +299,60 @@ select.select-input:focus {
     white-space: nowrap;
 }
 
+/* Number inputs (match text inputs) */
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--text);
+    font-family: inherit;
+    transition: background-color 0.25s ease, color 0.25s ease,
+                border-color 0.25s ease, box-shadow 0.25s ease;
+}
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(212,175,55,0.20);
+}
+
+/* Checkbox option rows (e.g. checksum algorithms) */
+.algo-options { display: flex; flex-wrap: wrap; gap: 16px; }
+.algo-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-weight: 400;
+    color: var(--text);
+}
+
+/* Data tables (archive inspector, checksums, renamer) */
+.table-wrap { overflow-x: auto; margin-bottom: 18px; }
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.data-table th, .data-table td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+.data-table th {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-size: 11px;
+}
+.data-table td.mono {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    white-space: normal;
+    word-break: break-all;
+}
+
 /* Compressor result card */
 .result-card {
     background: var(--panel);

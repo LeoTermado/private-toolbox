@@ -299,6 +299,42 @@ select.select-input:focus {
     white-space: nowrap;
 }
 
+/* Text areas (match text inputs) */
+textarea.text-area {
+    width: 100%;
+    min-height: 160px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 13px;
+    resize: vertical;
+    transition: background-color 0.25s ease, color 0.25s ease,
+                border-color 0.25s ease, box-shadow 0.25s ease;
+}
+textarea.text-area:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(212,175,55,0.20);
+}
+
+/* Read-only result/code block */
+.code-block {
+    background: var(--subtle-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin: 0 0 18px;
+    overflow: auto;
+    max-height: 420px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 13px;
+    white-space: pre;
+    color: var(--text);
+}
+
 /* Number inputs (match text inputs) */
 input[type="number"] {
     width: 100%;

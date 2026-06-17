@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Text Cleaner — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>🧹 Text Cleaner</h1>
+    <p class="subtitle">Tidy up pasted or uploaded text: trim, collapse whitespace, fix blank lines.</p>
+</header>
+
+<div class="panel">
+    <form action="{{ url_for('text_cleaner.clean') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="text">Paste Text</label>
+            <textarea id="text" name="text" class="text-area" placeholder="Paste your text here…"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="file">…or upload a text file <span class="hint-inline">(optional)</span></label>
+            <input type="file" id="file" name="file" accept=".txt,.md,.csv,.log,.text">
+            <p class="hint">If a file is uploaded, it is used instead of the pasted text.</p>
+        </div>
+
+        <div class="form-group">
+            <label>Cleaning Options</label>
+            <div class="algo-options">
+                {% for value, label, default in options %}
+                <label class="algo-option">
+                    <input type="checkbox" name="options" value="{{ value }}"
+                           {% if value in selected_options %}checked{% endif %}>
+                    {{ label }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn">🧹 Clean Text</button>
+    </form>
+
+    <form action="{{ url_for('text_cleaner.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">Cleaned text</h2>
+    <div class="result-stats">
+        <div class="result-stat">
+            <span class="result-stat-label">Before</span>
+            <span class="result-stat-value">{{ result.before.lines }} lines / {{ result.before.chars }} chars</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">After</span>
+            <span class="result-stat-value">{{ result.after.lines }} lines / {{ result.after.chars }} chars</span>
+        </div>
+    </div>
+    <pre class="code-block">{{ result.output_text }}</pre>
+    <a class="btn" href="{{ url_for('text_cleaner.download', filename=result.download_name) }}">Download cleaned text</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Photo EXIF Scrubber — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>🧼 Photo EXIF Scrubber</h1>
+    <p class="subtitle">Remove EXIF and embedded metadata (camera, GPS, timestamps) from an image.</p>
+</header>
+
+<div class="panel">
+    <form action="{{ url_for('photo_exif_scrubber.scrub') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select Image</label>
+            <input type="file" id="file" name="file"
+                   accept=".png,.jpg,.jpeg,.webp,.bmp,.gif,.tiff,.tif" required>
+            <p class="hint">The image is rebuilt from pixels only, so embedded metadata is dropped.</p>
+        </div>
+
+        <button type="submit" class="btn">🧼 Scrub Metadata</button>
+    </form>
+
+    <form action="{{ url_for('photo_exif_scrubber.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">Metadata scrubbed</h2>
+
+    {% if result.had_exif %}
+    <p class="hint">Removed {{ result.exif_count }} EXIF tag(s) from the original image.</p>
+    {% else %}
+    <div class="result-warning">No EXIF tags were detected — a clean copy was still created.</div>
+    {% endif %}
+
+    <div class="result-stats">
+        <div class="result-stat">
+            <span class="result-stat-label">Original</span>
+            <span class="result-stat-value">{{ result.original_human }}</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Cleaned</span>
+            <span class="result-stat-value">{{ result.output_human }}</span>
+        </div>
+    </div>
+
+    <a class="btn" href="{{ url_for('photo_exif_scrubber.download', filename=result.download_name) }}">Download clean image</a>
+</div>
+{% endif %}
+{% endblock %}

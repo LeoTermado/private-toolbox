@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Structured Data Beautifier — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>✨ Structured Data Beautifier</h1>
+    <p class="subtitle">Pretty-print or minify JSON and XML.</p>
+</header>
+
+<div class="panel">
+    <form action="{{ url_for('structured_data_beautifier.process') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="data">Paste JSON or XML</label>
+            <textarea id="data" name="data" class="text-area" placeholder='{"hello": "world"}'></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="file">…or upload a file <span class="hint-inline">(optional)</span></label>
+            <input type="file" id="file" name="file" accept=".json,.xml,.txt">
+            <p class="hint">If a file is uploaded, it is used instead of the pasted text.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="format">Format</label>
+            <select id="format" name="format" class="select-input">
+                {% for value, label in formats %}
+                <option value="{{ value }}" {% if value == selected_format %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="mode">Mode</label>
+            <select id="mode" name="mode" class="select-input">
+                {% for value, label in modes %}
+                <option value="{{ value }}" {% if value == selected_mode %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="indent">Indent (spaces)</label>
+            <input type="number" id="indent" name="indent" min="0" max="8" value="{{ indent }}">
+        </div>
+
+        <button type="submit" class="btn">✨ Format Data</button>
+    </form>
+
+    <form action="{{ url_for('structured_data_beautifier.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">Formatted {{ result.resolved_format }}</h2>
+    <pre class="code-block">{{ result.output_text }}</pre>
+    <a class="btn" href="{{ url_for('structured_data_beautifier.download', filename=result.download_name) }}">Download result</a>
+</div>
+{% endif %}
+{% endblock %}

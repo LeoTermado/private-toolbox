@@ -286,11 +286,14 @@ The project should stay practical, readable, and useful.
 
 ## License
 
-Private Toolbox is intended to be free and open-source friendly.
+Private Toolbox is licensed under the GNU General Public License v3.0.
 
-A final license has not been selected yet. The license will be added before the first proper public release.
+You are free to use, study, share, and modify this project. You may also use it commercially.
 
-Until then, please keep project credit and attribution attached to the original project.
+If you distribute modified versions or projects based on this code, you must keep the same license, preserve copyright and license notices, document your changes, and make the corresponding source code available.
+
+Copyright © 2026 Leo Termado.
+
 
 ---
 

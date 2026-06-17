@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}ZIP Splitter — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>📦 ZIP Splitter</h1>
+    <p class="subtitle">Split a ZIP archive into smaller ZIP parts under a size limit.</p>
+</header>
+
+<div class="panel">
+    <form action="{{ url_for('zip_splitter.split') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select ZIP File</label>
+            <input type="file" id="file" name="file" accept=".zip" required>
+        </div>
+
+        <div class="form-group">
+            <label for="max_mb">Max Size Per Part (MB)</label>
+            <input type="number" id="max_mb" name="max_mb" min="1" max="2048" value="{{ default_max_mb }}">
+            <p class="hint">Whole files are never split across parts. A single file larger than the
+            limit becomes its own part.</p>
+        </div>
+
+        <button type="submit" class="btn">📦 Split ZIP</button>
+    </form>
+
+    <form action="{{ url_for('zip_splitter.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">Split into {{ result.part_count }} part(s)</h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Part</th><th>Files</th><th>Size</th></tr></thead>
+            <tbody>
+                {% for part in result.parts %}
+                <tr><td>{{ part.name }}</td><td>{{ part.file_count }}</td><td>{{ part.size_human }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a class="btn" href="{{ url_for('zip_splitter.download', filename=result.bundle_name) }}">Download all parts (.zip)</a>
+</div>
+{% endif %}
+{% endblock %}

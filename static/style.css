@@ -335,8 +335,8 @@ textarea.text-area:focus {
     color: var(--text);
 }
 
-/* Number inputs (match text inputs) */
-input[type="number"] {
+/* Number / password inputs (match text inputs) */
+input[type="number"], input[type="password"] {
     width: 100%;
     padding: 10px;
     border: 1px solid var(--border);
@@ -347,7 +347,7 @@ input[type="number"] {
     transition: background-color 0.25s ease, color 0.25s ease,
                 border-color 0.25s ease, box-shadow 0.25s ease;
 }
-input[type="number"]:focus {
+input[type="number"]:focus, input[type="password"]:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(212,175,55,0.20);

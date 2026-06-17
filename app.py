@@ -43,10 +43,10 @@ TOOLS = [
     {"endpoint": "pdf_to_image.index",     "path": "/pdf/to-image/",     "label": "PDF to Image",      "icon": "🏞️", "implemented": False},
     {"endpoint": "file_renamer.index",     "path": "/files/renamer/",    "label": "File Renamer",      "icon": "✏️", "implemented": True},
     {"endpoint": "text_cleaner.index",     "path": "/text/cleaner/",     "label": "Text Cleaner",      "icon": "🧹", "implemented": True},
-    {"endpoint": "zip_splitter.index",     "path": "/files/zip-splitter/", "label": "ZIP Splitter",    "icon": "📦", "implemented": False},
+    {"endpoint": "zip_splitter.index",     "path": "/files/zip-splitter/", "label": "ZIP Splitter",    "icon": "📦", "implemented": True},
     {"endpoint": "ocr_organizer.index",    "path": "/ocr/organizer/",    "label": "OCR Organizer",     "icon": "🔍", "implemented": False},
     {"endpoint": "document_redactor.index", "path": "/privacy/redactor/", "label": "Document Redactor", "icon": "🕵️", "implemented": False},
-    {"endpoint": "pdf_password_guard.index", "path": "/pdf/password-guard/", "label": "PDF Password Guard", "icon": "🔒", "implemented": False},
+    {"endpoint": "pdf_password_guard.index", "path": "/pdf/password-guard/", "label": "PDF Password Guard", "icon": "🔒", "implemented": True},
     {"endpoint": "pdf_metadata_purge.index", "path": "/pdf/metadata-purge/", "label": "PDF Metadata Purge", "icon": "🧽", "implemented": True},
     {"endpoint": "image_format_changer.index", "path": "/image/format-changer/", "label": "Universal Image Format Changer", "icon": "🔄", "implemented": True},
     {"endpoint": "image_resizer_compressor.index", "path": "/image/resizer-compressor/", "label": "Image Resizer & Compressor", "icon": "📐", "implemented": True},
@@ -58,7 +58,7 @@ TOOLS = [
     {"endpoint": "media_converter.index", "path": "/media/converter/", "label": "Audio & Video Converter", "icon": "🎬", "implemented": False},
     {"endpoint": "video_trimmer_animation.index", "path": "/media/video-trimmer/", "label": "Video Snippet Trimmer & Animation Creator", "icon": "✂️", "implemented": False},
     {"endpoint": "background_eraser.index", "path": "/image/background-eraser/", "label": "Automated Asset Background Eraser", "icon": "🪄", "implemented": False},
-    {"endpoint": "document_transpiler.index", "path": "/documents/transpiler/", "label": "Advanced Document Transpiler", "icon": "📑", "implemented": False},
+    {"endpoint": "document_transpiler.index", "path": "/documents/transpiler/", "label": "Advanced Document Transpiler", "icon": "📑", "implemented": True},
 ]
 
 # Category grouping for the sidebar accordion and the home dashboard sections.

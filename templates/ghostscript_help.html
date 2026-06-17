@@ -2,17 +2,281 @@
 {% block title %}Why do I need Ghostscript? — Private Toolbox{% endblock %}
 
 {% block content %}
+<div class="help-page">
 <header class="page-header">
     <h1>Why do I need Ghostscript?</h1>
+    <p class="subtitle">Download, install, and set up Ghostscript for the PDF Compressor.</p>
 </header>
 
-<div class="panel">
-    <p>Ghostscript helps this toolbox perform stronger PDF compression. A full
-    Ghostscript download and installation tutorial will be added here.</p>
-
-    <p class="hint">After installing Ghostscript, restart the Flask app and reopen
-    the PDF Compressor page.</p>
-
+<div class="help-back">
     <a class="btn-link" href="{{ url_for('pdf_compressor.index') }}">&larr; Back to PDF Compressor</a>
+</div>
+
+<nav class="panel help-nav" aria-label="Quick navigation">
+    <h2>Quick navigation</h2>
+    <ul>
+        <li><a href="#short-answer">Short answer</a></li>
+        <li><a href="#what-ghostscript-is">What Ghostscript is</a></li>
+        <li><a href="#why-the-pdf-compressor-needs-ghostscript">Why the PDF Compressor needs Ghostscript</a></li>
+        <li><a href="#what-happens-without-ghostscript">What happens without Ghostscript</a></li>
+        <li><a href="#which-version-to-install">Which version to install</a></li>
+        <li><a href="#how-to-download-ghostscript">How to download Ghostscript</a></li>
+        <li><a href="#how-to-install-ghostscript-on-windows">How to install Ghostscript on Windows</a></li>
+        <li><a href="#how-to-add-ghostscript-to-path-manually">How to add Ghostscript to PATH manually</a></li>
+        <li><a href="#how-to-test-the-installation">How to test the installation</a></li>
+        <li><a href="#what-to-do-after-installing-ghostscript">What to do after installing Ghostscript</a></li>
+        <li><a href="#if-the-compressor-still-does-not-detect-ghostscript">If the compressor still does not detect Ghostscript</a></li>
+        <li><a href="#why-some-pdfs-do-not-shrink-much">Why some PDFs do not shrink much</a></li>
+        <li><a href="#recommended-compression-level">Recommended compression level</a></li>
+        <li><a href="#important-licensing-note">Important licensing note</a></li>
+    </ul>
+</nav>
+
+<section class="panel help-section">
+    <h2 id="short-answer">Short answer</h2>
+    <p>The PDF Compressor works best with Ghostscript.</p>
+    <p>Ghostscript gives the toolbox access to strong PDF compression. It can reduce file size
+    much better than the basic fallback mode, especially for PDFs with images, scanned pages,
+    exported slides, or large embedded media.</p>
+    <p>Without Ghostscript, the compressor still works, but it uses basic fallback compression.
+    That fallback is weaker and may only reduce the file size a little. In some cases, the output
+    file can even become slightly larger.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="what-ghostscript-is">What Ghostscript is</h2>
+    <p>Ghostscript is an external system program for working with PDF and PostScript files.</p>
+    <p>It is not a normal Python package. It should not be installed with pip, and it should not
+    be added to <code>requirements.txt</code>.</p>
+    <p>This toolbox uses Ghostscript from the command line when it is available on your system.</p>
+    <p>On Windows, the important command-line executable is:</p>
+    <pre><code>gswin64c.exe</code></pre>
+    <p>The PDF Compressor automatically checks whether Ghostscript is available when you open the
+    compressor page.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="why-the-pdf-compressor-needs-ghostscript">Why the PDF Compressor needs Ghostscript</h2>
+    <p>PDF files can contain many different kinds of content:</p>
+    <ul>
+        <li>normal text</li>
+        <li>vector graphics</li>
+        <li>embedded images</li>
+        <li>scanned pages</li>
+        <li>exported PowerPoint slides</li>
+        <li>metadata</li>
+        <li>fonts</li>
+        <li>already compressed objects</li>
+    </ul>
+    <p>The basic Python fallback can only optimize some internal PDF streams.</p>
+    <p>Ghostscript can do stronger PDF optimization. It can rewrite the PDF and apply compression
+    profiles that reduce file size in a controlled way. This is especially useful for PDFs that
+    contain images or scanned pages.</p>
+    <p>That is why the PDF Compressor&rsquo;s three compression levels work best with Ghostscript:</p>
+    <ul>
+        <li>Low compression / best quality</li>
+        <li>Medium compression / balanced</li>
+        <li>High compression / smallest file</li>
+    </ul>
+</section>
+
+<section class="panel help-section">
+    <h2 id="what-happens-without-ghostscript">What happens without Ghostscript</h2>
+    <p>If Ghostscript is not installed, the toolbox falls back to basic PyPDF2 compression.</p>
+    <p>This fallback is useful because the compressor can still run without extra system software,
+    but it has limits.</p>
+    <p>The fallback usually cannot:</p>
+    <ul>
+        <li>strongly downsample images</li>
+        <li>optimize scanned PDFs well</li>
+        <li>shrink exported slide decks as much as Ghostscript</li>
+        <li>guarantee that the output file becomes smaller</li>
+    </ul>
+    <p>So if Ghostscript is missing, the compressor may show a warning and the result may be weaker.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="which-version-to-install">Which version to install</h2>
+    <p>Install the official Windows 64-bit AGPL version from the Ghostscript website.</p>
+    <p>For this project, we tested:</p>
+    <ul>
+        <li>Ghostscript 10.07.1 for Windows (64 bit)</li>
+        <li>Ghostscript AGPL Release</li>
+        <li>Tested on: 04.06.2026</li>
+    </ul>
+    <p>At the time of testing, Ghostscript 10.07.1 was the latest official release. The official
+    Ghostscript release page listed Ghostscript 10.07.1 as released on 2026-05-19.</p>
+    <p>If a newer 10.x version is available on the official Ghostscript page, it should usually also
+    work. The toolbox looks for the normal Ghostscript command-line executable and does not depend
+    on one exact version number.</p>
+    <p>Choose:</p>
+    <ul>
+        <li>Ghostscript 10.x.x for Windows (64 bit)</li>
+        <li>Ghostscript AGPL Release</li>
+    </ul>
+    <p>Do not choose the commercial license version unless you specifically need a commercial
+    Ghostscript license.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="how-to-download-ghostscript">How to download Ghostscript</h2>
+    <p>Open the official Ghostscript download page:</p>
+    <p><a href="https://ghostscript.com/releases/gsdnld.html" target="_blank" rel="noopener noreferrer">https://ghostscript.com/releases/gsdnld.html</a></p>
+    <p>On Windows, choose the Windows 64-bit AGPL download.</p>
+    <p>You should select:</p>
+    <ul>
+        <li>Ghostscript 10.x.x for Windows (64 bit)</li>
+        <li>Ghostscript AGPL Release</li>
+    </ul>
+    <p>Do not download from random third-party sites. Use the official Ghostscript website.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="how-to-install-ghostscript-on-windows">How to install Ghostscript on Windows</h2>
+    <ol>
+        <li>Download the Windows 64-bit AGPL installer from:
+            <p><a href="https://ghostscript.com/releases/gsdnld.html" target="_blank" rel="noopener noreferrer">https://ghostscript.com/releases/gsdnld.html</a></p>
+        </li>
+        <li>Run the downloaded installer.</li>
+        <li>Keep the default installation path unless you have a reason to change it.
+            <p>It usually installs into a folder like:</p>
+            <pre><code>C:\Program Files\gs\gs10.07.1\</code></pre>
+        </li>
+        <li>During installation, leave optional font/support components enabled if they are already
+            selected.
+            <p>Extra font support is not required for normal PDF compression, but it usually does
+            not hurt.</p>
+        </li>
+        <li>Finish the installation.</li>
+    </ol>
+</section>
+
+<section class="panel help-section">
+    <h2 id="how-to-add-ghostscript-to-path-manually">How to add Ghostscript to PATH manually</h2>
+    <p>The PDF Compressor needs Windows to find this command:</p>
+    <pre><code>gswin64c.exe</code></pre>
+    <p>Usually, Ghostscript&rsquo;s installer adds it to PATH automatically.</p>
+    <p>If it does not, add the Ghostscript bin folder manually.</p>
+    <p>The folder usually looks like this:</p>
+    <pre><code>C:\Program Files\gs\gs10.07.1\bin</code></pre>
+    <p>Replace <code>gs10.07.1</code> with the version you installed.</p>
+    <h3>Steps:</h3>
+    <ol>
+        <li>Press the Windows key.</li>
+        <li>Search for: <code>Environment Variables</code></li>
+        <li>Open: <code>Edit the system environment variables</code></li>
+        <li>Click: <code>Environment Variables</code></li>
+        <li>Select the Path variable.
+            <p>You can use either your user Path or the system Path.</p>
+        </li>
+        <li>Click: <code>Edit</code></li>
+        <li>Click: <code>New</code></li>
+        <li>Add the Ghostscript bin folder, for example:
+            <pre><code>C:\Program Files\gs\gs10.07.1\bin</code></pre>
+        </li>
+        <li>Click OK until all windows are closed.</li>
+        <li>Restart VS Code and all open terminals.</li>
+    </ol>
+</section>
+
+<section class="panel help-section">
+    <h2 id="how-to-test-the-installation">How to test the installation</h2>
+    <p>Open a new PowerShell window.</p>
+    <p>First run:</p>
+    <pre><code>where.exe gswin64c</code></pre>
+    <p>Expected result:</p>
+    <pre><code>C:\Program Files\gs\gs10.07.1\bin\gswin64c.exe</code></pre>
+    <p>Then run:</p>
+    <pre><code>gswin64c -version</code></pre>
+    <p>Expected result:</p>
+    <pre><code>GPL Ghostscript 10.07.1</code></pre>
+    <p>The exact version number can be different if you installed a newer version.</p>
+    <p>If both commands work, Ghostscript is installed correctly and available on PATH.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="what-to-do-after-installing-ghostscript">What to do after installing Ghostscript</h2>
+    <p>After installing Ghostscript, restart:</p>
+    <ul>
+        <li>VS Code</li>
+        <li>your terminal</li>
+        <li>the Flask app</li>
+    </ul>
+    <p>Then start the toolbox again:</p>
+    <pre><code>python run.py</code></pre>
+    <p>Open the PDF Compressor page again.</p>
+    <p>If Ghostscript was installed correctly, the status card should show that Ghostscript was
+    detected and strong PDF compression is available.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="if-the-compressor-still-does-not-detect-ghostscript">If the compressor still does not detect Ghostscript</h2>
+    <p>First, test Ghostscript in a new PowerShell window:</p>
+    <pre><code>where.exe gswin64c</code></pre>
+    <p>If this does not show a path, Ghostscript is either not installed correctly or its bin folder
+    is not on PATH.</p>
+    <p>If the command works in PowerShell but the toolbox still does not detect Ghostscript:</p>
+    <ol>
+        <li>Stop the Flask app.</li>
+        <li>Close VS Code.</li>
+        <li>Open VS Code again.</li>
+        <li>Open a new terminal.</li>
+        <li>Start the app again:
+            <pre><code>python run.py</code></pre>
+        </li>
+    </ol>
+    <p>This is needed because the Flask app may have been started before Windows updated the PATH
+    environment.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="why-some-pdfs-do-not-shrink-much">Why some PDFs do not shrink much</h2>
+    <p>This is normal.</p>
+    <p>Compression results depend on the PDF content.</p>
+    <p>A PDF may already be optimized. It may contain mostly text or vector graphics. In those cases,
+    there is not much left to compress.</p>
+    <p>For some PDFs, low and medium compression may look visually identical and still reduce the
+    file size a lot. High compression may reduce the file a little more, but images can become
+    visibly worse.</p>
+    <p>PDFs that usually shrink more:</p>
+    <ul>
+        <li>scanned PDFs</li>
+        <li>image-heavy PDFs</li>
+        <li>PDFs exported from PowerPoint</li>
+        <li>PDFs with many photos</li>
+        <li>PDFs with large embedded media</li>
+    </ul>
+    <p>PDFs that may not shrink much:</p>
+    <ul>
+        <li>mostly text-based PDFs</li>
+        <li>already optimized PDFs</li>
+        <li>PDFs with simple vector graphics</li>
+        <li>very small PDFs</li>
+    </ul>
+</section>
+
+<section class="panel help-section">
+    <h2 id="recommended-compression-level">Recommended compression level</h2>
+    <p>Use this rule:</p>
+    <pre><code>Low compression    = best quality
+Medium compression = recommended default
+High compression   = smallest file, possible visible quality loss</code></pre>
+    <p>For normal use, medium compression is the best default.</p>
+    <p>Use high compression only when file size matters more than image quality.</p>
+</section>
+
+<section class="panel help-section">
+    <h2 id="important-licensing-note">Important licensing note</h2>
+    <p>This toolbox does not bundle Ghostscript.</p>
+    <p>Users install Ghostscript separately from the official Ghostscript website.</p>
+    <p>Ghostscript is available under the AGPL license or a commercial license. For normal local use
+    of this toolbox, installing the AGPL release separately is the intended setup.</p>
+    <p>Do not copy the Ghostscript installer or Ghostscript program files into this GitHub project
+    unless you understand the license obligations.</p>
+</section>
+
+<div class="help-back">
+    <a class="btn-link" href="{{ url_for('pdf_compressor.index') }}">&larr; Back to PDF Compressor</a>
+</div>
 </div>
 {% endblock %}

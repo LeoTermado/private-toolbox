@@ -57,7 +57,7 @@ TOOLS = [
     {"endpoint": "archive_content_inspector.index", "path": "/files/archive-inspector/", "label": "Archive Content Inspector", "icon": "🗃️", "implemented": True},
     {"endpoint": "media_converter.index", "path": "/media/converter/", "label": "Audio & Video Converter", "icon": "🎬", "implemented": False},
     {"endpoint": "video_trimmer_animation.index", "path": "/media/video-trimmer/", "label": "Video Snippet Trimmer & Animation Creator", "icon": "✂️", "implemented": False},
-    {"endpoint": "background_eraser.index", "path": "/image/background-eraser/", "label": "Automated Asset Background Eraser", "icon": "🪄", "implemented": False},
+    {"endpoint": "background_eraser.index", "path": "/image/background-eraser/", "label": "Automated Asset Background Eraser", "icon": "🪄", "implemented": True},
     {"endpoint": "document_transpiler.index", "path": "/documents/transpiler/", "label": "Advanced Document Transpiler", "icon": "📑", "implemented": True},
 ]
 

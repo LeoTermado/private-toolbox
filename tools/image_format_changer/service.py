@@ -1,6 +1,8 @@
 """Universal Image Format Changer logic (no Flask).
 
 Converts an uploaded image to another format using Pillow (already installed).
+Supports a broad set of common raster formats both as input and output, with
+robust colour-mode handling so any supported type can convert to any other.
 """
 import os
 
@@ -15,7 +17,11 @@ TOOL_SLUG = "image_format_changer"
 IMG_INPUT = tool_input_dir(TOOL_SLUG)
 IMG_OUTPUT = tool_output_dir(TOOL_SLUG)
 
-INPUT_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".tiff", ".tif"}
+# Input types Pillow reads reliably.
+INPUT_EXTENSIONS = {
+    ".png", ".jpg", ".jpeg", ".jfif", ".webp", ".bmp", ".gif",
+    ".tiff", ".tif", ".ico", ".tga", ".ppm", ".pgm", ".pbm",
+}
 
 # Target formats offered in the UI -> (Pillow format, output extension).
 TARGET_FORMATS = [
@@ -25,15 +31,18 @@ TARGET_FORMATS = [
     ("BMP", "BMP (.bmp)"),
     ("GIF", "GIF (.gif)"),
     ("TIFF", "TIFF (.tiff)"),
+    ("ICO", "ICO (.ico)"),
+    ("TGA", "TGA (.tga)"),
+    ("PPM", "PPM (.ppm)"),
 ]
 _FORMAT_EXT = {
-    "PNG": ".png", "JPEG": ".jpg", "WEBP": ".webp",
-    "BMP": ".bmp", "GIF": ".gif", "TIFF": ".tiff",
+    "PNG": ".png", "JPEG": ".jpg", "WEBP": ".webp", "BMP": ".bmp",
+    "GIF": ".gif", "TIFF": ".tiff", "ICO": ".ico", "TGA": ".tga", "PPM": ".ppm",
 }
 DEFAULT_FORMAT = "PNG"
 
 # Formats that cannot store an alpha channel.
-_NO_ALPHA = {"JPEG", "BMP"}
+_NO_ALPHA = {"JPEG", "BMP", "PPM"}
 
 
 def ensure_image_folders():
@@ -49,6 +58,22 @@ def is_supported_format(fmt):
     return fmt in _FORMAT_EXT
 
 
+def _prepare(img, target_format):
+    """Coerce the image into a colour mode the target format can store."""
+    if target_format in _NO_ALPHA:
+        # No alpha: keep grayscale as-is, otherwise flatten to RGB.
+        if img.mode not in ("RGB", "L"):
+            img = img.convert("RGB")
+    else:
+        # Alpha-capable (or palette) targets: normalize exotic modes to RGBA,
+        # and expand palette images so transparency survives.
+        if img.mode == "P":
+            img = img.convert("RGBA")
+        elif img.mode not in ("RGB", "RGBA", "L", "LA"):
+            img = img.convert("RGBA")
+    return img
+
+
 def convert_image(input_path, target_format):
     """Convert the image at input_path to target_format; return the output path."""
     ensure_image_folders()
@@ -57,10 +82,7 @@ def convert_image(input_path, target_format):
     output_path = unique_path(IMG_OUTPUT, f"{stem}{_FORMAT_EXT[target_format]}")
 
     with Image.open(input_path) as img:
-        if target_format in _NO_ALPHA and img.mode in ("RGBA", "LA", "P"):
-            img = img.convert("RGB")
-        elif img.mode == "P" and target_format not in _NO_ALPHA:
-            img = img.convert("RGBA")
-        img.save(output_path, format=target_format)
+        prepared = _prepare(img, target_format)
+        prepared.save(output_path, format=target_format)
 
     return output_path

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}PDF to Image — Private Toolbox{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1>🏞️ PDF to Image</h1>
+    <p class="subtitle">Render each page of a PDF to an image and download them as a ZIP.</p>
+</header>
+
+<div class="panel">
+    <form action="{{ url_for('pdf_to_image.convert') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select PDF File</label>
+            <input type="file" id="file" name="file" accept=".pdf" required>
+        </div>
+
+        <div class="form-group">
+            <label for="format">Image Format</label>
+            <select id="format" name="format" class="select-input">
+                {% for value, label in formats %}
+                <option value="{{ value }}" {% if value == selected_format %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="dpi">Resolution (DPI)</label>
+            <input type="number" id="dpi" name="dpi" min="36" max="600" value="{{ dpi }}">
+            <p class="hint">Higher DPI gives sharper, larger images. 150 is good for screen; 300 for print.</p>
+        </div>
+
+        <button type="submit" class="btn">🏞️ Convert to Images</button>
+    </form>
+
+    <form action="{{ url_for('pdf_to_image.archive') }}" method="POST"
+          data-confirm="Archive all current input and output files into 'old'?">
+        <button type="submit" class="btn btn-secondary">📦 Archive current files</button>
+    </form>
+</div>
+
+{% if result %}
+<div class="result-card">
+    <h2 class="result-title">Rendered {{ result.page_count }} page(s)</h2>
+    <div class="result-stats">
+        <div class="result-stat">
+            <span class="result-stat-label">Pages</span>
+            <span class="result-stat-value">{{ result.page_count }}</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Format</span>
+            <span class="result-stat-value">{{ result.format }}</span>
+        </div>
+        <div class="result-stat">
+            <span class="result-stat-label">Resolution</span>
+            <span class="result-stat-value">{{ result.dpi }} DPI</span>
+        </div>
+    </div>
+    <a class="btn" href="{{ url_for('pdf_to_image.download', filename=result.bundle_name) }}">Download images (.zip)</a>
+</div>
+{% endif %}
+{% endblock %}

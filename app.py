@@ -40,7 +40,7 @@ TOOLS = [
     {"endpoint": "pdf_merger.index",       "path": "/pdf/merger/",       "label": "PDF Merger",        "icon": "🔗", "implemented": True},
     {"endpoint": "pdf_compressor.index",   "path": "/pdf/compressor/",   "label": "PDF Compressor",    "icon": "🗜️", "implemented": True},
     {"endpoint": "image_to_pdf.index",     "path": "/image/to-pdf/",     "label": "Image to PDF",      "icon": "🖼️", "implemented": True},
-    {"endpoint": "pdf_to_image.index",     "path": "/pdf/to-image/",     "label": "PDF to Image",      "icon": "🏞️", "implemented": False},
+    {"endpoint": "pdf_to_image.index",     "path": "/pdf/to-image/",     "label": "PDF to Image",      "icon": "🏞️", "implemented": True},
     {"endpoint": "file_renamer.index",     "path": "/files/renamer/",    "label": "File Renamer",      "icon": "✏️", "implemented": True},
     {"endpoint": "text_cleaner.index",     "path": "/text/cleaner/",     "label": "Text Cleaner",      "icon": "🧹", "implemented": True},
     {"endpoint": "zip_splitter.index",     "path": "/files/zip-splitter/", "label": "ZIP Splitter",    "icon": "📦", "implemented": True},
@@ -147,4 +147,12 @@ app = create_app()
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    import os
+    from core.paths import INPUT_FOLDER, OUTPUT_FOLDER, OLD_FOLDER
+    # Use the stat reloader (watches imported modules only, not the working
+    # folders) so writing tool output never restarts the server. See run.py.
+    app.run(host='127.0.0.1', port=5000, debug=True, reloader_type='stat', exclude_patterns=[
+        os.path.join(INPUT_FOLDER, '*'),
+        os.path.join(OUTPUT_FOLDER, '*'),
+        os.path.join(OLD_FOLDER, '*'),
+    ])
